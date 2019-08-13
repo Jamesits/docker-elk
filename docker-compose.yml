@@ -50,7 +50,24 @@ services:
     depends_on:
       - elasticsearch
 
-networks:
+  filebeat:
+    build:
+      context: filebeat/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+       - ./filebeat/config/filebeat.yml:/usr/share/filebeat/config/filebeat.yml:ro
+    ports:
+       - "9001:9001"
+       - "9002:9002"
+    environment:
+       - ELASTICSEARCH_USERNAME=elastic
+       - ELASTICSEARCH_PASSWORD=changeme
+    networks:
+       - elk
+    depends_on:
+       - elasticsearch
 
+networks:
   elk:
     driver: bridge
