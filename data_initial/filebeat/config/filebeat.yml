@@ -1,8 +1,3 @@
-setup.kibana:
-  host: 'kibana:5601'
-  protocol: 'http'
-  path: '/'
-
 filebeat.config:
   modules:
     path: ${path.config}/modules.d/*.yml
@@ -18,5 +13,10 @@ processors:
 
 output.elasticsearch:
   hosts: '${ELASTICSEARCH_HOSTS:elasticsearch:9200}'
+  username: '${ELASTICSEARCH_USERNAME:}'
+  password: '${ELASTICSEARCH_PASSWORD:}'
+
+setup.kibana:
+  host: '${KIBANA_HOST:kibana:5601}'
   username: '${ELASTICSEARCH_USERNAME:}'
   password: '${ELASTICSEARCH_PASSWORD:}'

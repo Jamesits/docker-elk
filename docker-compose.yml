@@ -7,8 +7,10 @@ services:
       context: elasticsearch/
       args:
         ELK_VERSION: $ELK_VERSION
+    container_name: elasticsearch
     volumes:
-      - ./elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - /srv/elk/elasticsearch/data:/usr/share/elasticsearch/data:rw
+      - /srv/elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -18,31 +20,32 @@ services:
     networks:
       - elk
 
-  logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
-      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
-    ports:
-      - "5000:5000"
-      - "9600:9600"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
+  # logstash:
+  #   build:
+  #     context: logstash/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   container_name: logstash
+  #   volumes:
+  #     - /srv/elk/logstash/config:/usr/share/logstash/config:rw
+  #   ports:
+  #     - "5000:5000"
+  #     - "9600:9600"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   networks:
+  #     - elk
+  #   depends_on:
+  #     - elasticsearch
 
   kibana:
     build:
       context: kibana/
       args:
         ELK_VERSION: $ELK_VERSION
+    container_name: kibana
     volumes:
-      - ./kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - /srv/elk/kibana/config:/usr/share/kibana/config:rw
     ports:
       - "5601:5601"
     networks:
@@ -55,18 +58,26 @@ services:
       context: filebeat/
       args:
         ELK_VERSION: $ELK_VERSION
+    container_name: filebeat
     volumes:
-       - ./filebeat/config/filebeat.yml:/usr/share/filebeat/config/filebeat.yml:ro
+       - /srv/elk/filebeat/config:/usr/share/filebeat/config:rw
     ports:
-       - "9001:9001"
-       - "9002:9002"
+       # Cisco ASA
+       - "9001:9001/udp"
+       # Cisco router
+       - "514:9002/udp"
     environment:
        - ELASTICSEARCH_USERNAME=elastic
        - ELASTICSEARCH_PASSWORD=changeme
+       - ELASTICSEARCH_HOST=elasticsearch
+       - KIBANA_HOST=kibana
+    # disable strict permission checks
+    command: ["--strict.perms=false"]
     networks:
        - elk
     depends_on:
        - elasticsearch
+       - kibana
 
 networks:
   elk:
