@@ -1,6 +1,0 @@
-filebeat.inputs:
-- type: syslog
-  protocol.udp:
-    host: "0.0.0.0:514"
-  protocol.tcp:
-    host: "0.0.0.0:514"

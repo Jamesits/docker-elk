@@ -6,6 +6,7 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 # create directory structure and put in config files
 mkdir -p /srv/elk
 cp -r ./data_initial/* /srv/elk
+# this folder should be writeable prior to container creation so it cannot be created by docker daemon
 mkdir -p /srv/elk/elasticsearch/data
 
 # user in docker containers is mapped to UID 1000

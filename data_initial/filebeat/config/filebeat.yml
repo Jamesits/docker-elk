@@ -1,12 +1,23 @@
 filebeat.config:
   modules:
     path: ${path.config}/modules.d/*.yml
-    reload.enabled: false
+    reload.enabled: true
+    reload.period: 5s
 
 #filebeat.autodiscover:
 #  providers:
 #    - type: docker
 #      hints.enabled: true
+
+# IDK why listening directly on 514 gaves me permission denied even CAP_NET_BIND_SERVICE is set
+filebeat.inputs:
+- type: syslog
+  protocol.udp:
+    host: ":5114"
+- type: syslog
+  protocol.tcp:
+    host: ":5114"
+
 
 processors:
 - add_cloud_metadata: ~
