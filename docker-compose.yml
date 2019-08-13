@@ -63,10 +63,14 @@ services:
        - /srv/elk/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
        - /srv/elk/filebeat/config/modules.d:/usr/share/filebeat/modules.d:ro
     ports:
+       # syslog TCP
+       - "601:514/tcp"
+       # syslog UDP
+       - "514:514/udp"
        # Cisco ASA
        - "9001:9001/udp"
        # Cisco router
-       - "514:9002/udp"
+       - "9002:9002/udp"
     environment:
        - ELASTICSEARCH_USERNAME=elastic
        - ELASTICSEARCH_PASSWORD=changeme
