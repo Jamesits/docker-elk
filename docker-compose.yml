@@ -45,7 +45,7 @@ services:
         ELK_VERSION: $ELK_VERSION
     container_name: kibana
     volumes:
-      - /srv/elk/kibana/config:/usr/share/kibana/config:rw
+      - /srv/elk/kibana/config:/usr/share/kibana/config:ro
     ports:
       - "5601:5601"
     networks:
@@ -60,7 +60,8 @@ services:
         ELK_VERSION: $ELK_VERSION
     container_name: filebeat
     volumes:
-       - /srv/elk/filebeat/config:/usr/share/filebeat/config:rw
+       - /srv/elk/filebeat/config/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+       - /srv/elk/filebeat/config/modules.d:/usr/share/filebeat/modules.d:ro
     ports:
        # Cisco ASA
        - "9001:9001/udp"
@@ -72,7 +73,7 @@ services:
        - ELASTICSEARCH_HOST=elasticsearch
        - KIBANA_HOST=kibana
     # disable strict permission checks
-    command: ["--strict.perms=false"]
+    command: ["--strict.perms=false", "-e"]
     networks:
        - elk
     depends_on:
